@@ -47,3 +47,21 @@ const variations = {
         }
     `,
 };
+
+const Button = styled.button`
+    border: 0;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm);
+
+    ${({ size }) => sizes[size]}
+
+    ${({ variation }) => variations[variation]}
+`;
+
+// You can define static defaultProps to set the default props for the styled component
+Button.defaultProps = {
+    variation: 'primary',
+    size: 'medium',
+};
+
+export default Button;
