@@ -1,10 +1,9 @@
-import Spinner from 'ui/Spinner';
-import { useSettings } from 'features/settings/useSettings';
-import { useUpdateSetting } from 'features/settings/useUpdateSetting';
-
-import Form from 'ui/Form';
-import FormRow from 'ui/FormRow';
-import Input from 'ui/Input';
+import { useSettings } from './useSettings';
+import { useUpdateSetting } from './useUpdateSetting';
+import Spinner from '../../ui/Spinner';
+import Form from '../../ui/Form';
+import FormRow from '../../ui/FormRow';
+import Input from '../../ui/Input';
 
 const UpdateSettingsForm = () => {
     const {
@@ -16,15 +15,20 @@ const UpdateSettingsForm = () => {
         } = {},
         isLoading,
     } = useSettings();
-    const { mutate: updateSetting, isLoading: isUpdating } = useUpdateSetting();
+    const { updateSetting, isUpdating } = useUpdateSetting();
 
-    // return <Spinner />;
-    if (isLoading) return <Spinner />;
+    if (isLoading) {
+        return <Spinner />;
+    }
 
+    // The update will be applied onBlur
     const handleBlur = (e, field) => {
-        const { value } = e.target;
+        const { value } = e.target; // Value from the event
 
-        if (!value) return;
+        if (!value) {
+            return;
+        }
+        // Computes whatever the field value reprensents
         updateSetting({ [field]: value });
     };
 
