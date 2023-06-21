@@ -1,4 +1,8 @@
+import { cloneElement, createContext, useContext, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { HiXMark } from 'react-icons/hi2';
 import styled from 'styled-components';
+import { useOutsideClick } from '../hooks/useOutsideClick';
 
 const StyledModal = styled.div`
     position: fixed;
@@ -48,3 +52,61 @@ const Button = styled.button`
         color: var(--color-grey-500);
     }
 `;
+
+const ModalContext = createContext();
+
+const Modal = ({ children }) => {
+    // State that defines which window will be opened in the modal
+    const [openWindowName, setOpenWindowName] = useState('');
+
+    const close = () => setOpenWindowName('');
+    const open = setOpenWindowName;
+
+    const contextValue = {
+        openWindowName,
+        close,
+        open,
+    };
+
+    return (
+        <ModalContext.Provider value={contextValue}>
+            {children}
+        </ModalContext.Provider>
+    );
+};
+
+// Modal Property
+const Open = ({ children, opens: windowName }) => {
+    const { open } = useContext(ModalContext);
+
+    // Clones the element and adds additional props to it
+    // Additional onClick which is the open function from the context
+    return cloneElement(children, { onClick: () => open(windowName) });
+};
+
+const Window = ({ children, name }) => {
+    const { openWindowName, close } = useContext(ModalContext);
+    const ref = useOutsideClick(close);
+
+    if (name !== openWindowName) {
+        return null;
+    }
+
+    return createPortal(
+        <Overlay>
+            <StyledModal ref={ref}>
+                <Button onClick={close}>
+                    <HiXMark />
+                </Button>
+
+                <div>{cloneElement(children, { onCloseModal: close })}</div>
+            </StyledModal>
+        </Overlay>,
+        document.body
+    );
+};
+
+Modal.Open = Open;
+Modal.Window = Window;
+
+export default Modal;

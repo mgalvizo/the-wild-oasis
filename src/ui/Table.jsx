@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react';
 import styled from 'styled-components';
 
 const StyledTable = styled.div`
@@ -11,7 +12,7 @@ const StyledTable = styled.div`
 
 const CommonRow = styled.div`
     display: grid;
-    grid-template-columns: ${props => props.columns};
+    grid-template-columns: ${({ columns }) => columns};
     column-gap: 2.4rem;
     align-items: center;
     transition: none;
@@ -58,3 +59,54 @@ const Empty = styled.p`
     text-align: center;
     margin: 2.4rem;
 `;
+
+const TableContext = createContext();
+
+const Table = ({ columns, children }) => {
+    // Columns is the value of grid-template-columns: ; as a string
+    const contextValue = {
+        columns,
+    };
+
+    return (
+        <TableContext.Provider value={contextValue}>
+            <StyledTable role="table">{children}</StyledTable>
+        </TableContext.Provider>
+    );
+};
+
+const Header = ({ children }) => {
+    const { columns } = useContext(TableContext);
+
+    return (
+        <StyledHeader role="row" columns={columns} as="header">
+            {children}
+        </StyledHeader>
+    );
+};
+
+const Row = ({ children }) => {
+    const { columns } = useContext(TableContext);
+
+    return (
+        <StyledRow role="row" columns={columns}>
+            {children}
+        </StyledRow>
+    );
+};
+
+// Render props pattern, it will map the passed data and render the it
+const Body = ({ data, render }) => {
+    if (!data.length) {
+        return <Empty>No data to show at the moment.</Empty>;
+    }
+
+    return <StyledBody>{data.map(render)}</StyledBody>;
+};
+
+Table.Header = Header;
+Table.Body = Body;
+Table.Row = Row;
+Table.Footer = Footer;
+
+export default Table;
