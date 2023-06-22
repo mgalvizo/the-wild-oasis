@@ -1,9 +1,53 @@
 import { getToday } from '../utils/helpers';
 import supabase from './supabase';
+import { PAGE_SIZE } from '../utils/constants';
+
+// Filter is an object with the field and the value
+export const getBookings = async ({ filter, sortBy, page }) => {
+    let query = supabase
+        .from('bookings')
+        // Select only the necessary columns, exact returns the number of results in the count
+        .select(
+            'id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)',
+            { count: 'exact' }
+        );
+
+    // Only fetches the data according to the filtering
+    // Filter
+    if (filter) {
+        // The method is the operator on the query e.g. eq, gt, gte, etc...
+        query = query[filter.method || 'eq'](filter.field, filter.value);
+    }
+
+    // Sort
+    if (sortBy) {
+        query = query.order(sortBy.field, {
+            ascending: sortBy.direction === 'asc',
+        });
+    }
+
+    // Pagination
+    if (page) {
+        const from = (page - 1) * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+        query = query.range(from, to);
+    }
+
+    // count is the number of results the query returns
+    const { data, error, count } = await query;
+
+    if (error) {
+        console.error(error);
+        throw new Error('Bookings could not be loaded.');
+    }
+
+    return { data, count };
+};
 
 export const getBooking = async id => {
     const { data, error } = await supabase
         .from('bookings')
+        // Selects all fields from the referenced foreign tables
         .select('*, cabins(*), guests(*)')
         .eq('id', id)
         .single();
