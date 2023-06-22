@@ -31,9 +31,10 @@ const BookingTable = () => {
                 <Table.Body
                     data={bookings}
                     // Render props pattern
-                    render={booking => (
-                        <BookingRow key={booking.id} booking={booking} />
-                    )}
+                    render={booking => {
+                        const { id } = booking;
+                        return <BookingRow key={id} booking={booking} />;
+                    }}
                 />
                 <Table.Footer>
                     <Pagination count={count} />

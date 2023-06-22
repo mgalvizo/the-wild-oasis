@@ -52,9 +52,7 @@ const CheckinBooking = () => {
         settings.breakfastPrice * numNights * numGuests;
 
     const handleCheckin = () => {
-        if (!confirmPaid) {
-            return;
-        }
+        if (!confirmPaid) return;
 
         if (addBreakfast) {
             checkin({
@@ -65,6 +63,8 @@ const CheckinBooking = () => {
                     totalPrice: totalPrice + optionalBreakfastPrice,
                 },
             });
+        } else {
+            checkin({ bookingId, breakfast: {} });
         }
     };
 
@@ -92,6 +92,7 @@ const CheckinBooking = () => {
                     </Checkbox>
                 </Box>
             )}
+
             <Box>
                 <Checkbox
                     checked={confirmPaid}
@@ -110,6 +111,7 @@ const CheckinBooking = () => {
                           )})`}
                 </Checkbox>
             </Box>
+
             <ButtonGroup>
                 <Button
                     onClick={handleCheckin}
