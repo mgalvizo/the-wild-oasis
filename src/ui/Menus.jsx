@@ -93,6 +93,8 @@ const Toggle = ({ id }) => {
     const { openId, close, open, setPosition } = useContext(MenusContext);
 
     const handleClick = e => {
+        // When clicking again in the ellipsis the menu closes
+        e.stopPropagation();
         // Get rect of the button
         const rect = e.target.closest('button').getBoundingClientRect();
         // Position of the ellipsis button
@@ -114,7 +116,8 @@ const Toggle = ({ id }) => {
 
 const List = ({ id, children }) => {
     const { openId, position, close } = useContext(MenusContext);
-    const ref = useOutsideClick(close);
+    // false = Bubbling phase of the event
+    const ref = useOutsideClick(close, false);
 
     if (openId !== id) {
         return null;
